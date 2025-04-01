@@ -30,12 +30,12 @@ comidasBlancas = []
 comidasNegras = []
 #0 - turno de blancas, sin seleccion --> 1 turno de blancas, con seleccion --> 2 turno de negras , sin seleccion --> 3 turno de negras con seleccion
 pasoTurno = 0
-seleccion = 500
+seleccion = 100
 movimientosValidos = []
 
 #imagenes de las piezas y escalado para el tablero (revisar tamaños segun pantalla)
 
-reinaBlanca = pygame.image.load('ajedrez/juego/imagenes/reinab.png')
+reinaBlanca = pygame.image.load('imagenes/reinab.png')
 reinaBlanca = pygame.transform.scale(reinaBlanca, (80,80))
 reinaBlancaPeque = pygame.transform.scale(reinaBlanca, (45,45))
 reyBlanco = pygame.image.load('G:/Mi unidad/mantenimiento electronico/python/ajedrez/juego/imagenes/reyb.png')
@@ -56,7 +56,7 @@ peonBlancoPeque = pygame.transform.scale(peonBlanco, (45, 45))
 imagenesBlancas = [peonBlanco,reinaBlanca, reyBlanco, torreBlanca, alfilBlanco, caballoBlanco]
 magenesBlancasPeque = [peonBlancoPeque,reinaBlancaPeque, reyBlancoPeque, torreBlancaPeque, alfilBlancoPeque, caballoBlancoPeque]
 
-reinaNegra = pygame.image.load('ajedrez/juego/imagenes/reinan.png')
+reinaNegra = pygame.image.load('imagenes/reinan.png')
 reinaNegra = pygame.transform.scale(reinaNegra, (80, 80))
 reinaNegraPeque = pygame.transform.scale(reinaNegra, (45, 45))
 reyNegro = pygame.image.load('G:/Mi unidad/mantenimiento electronico/python/ajedrez/juego/imagenes/reyn.png')
@@ -107,6 +107,9 @@ def Piezas():
             screen.blit(peonBlanco, (whitePlaces[i][0] * 100 + 22, whitePlaces [i][1]* 100 +30))
         else:
             screen.blit(imagenesBlancas[index], (whitePlaces[i][0] * 100 + 10, whitePlaces [i] [1]* 100 +10))
+        if pasoTurno < 2 and seleccion < len(whitePlaces):
+            if seleccion ==i:
+                pygame.draw.rect(screen, 'red',[whitePlaces[i][0] *100 +1, whitePlaces[i][1]*100 + 1, 100,100], 2)
 
 
     for i in range(len(black)):
@@ -115,22 +118,169 @@ def Piezas():
             screen.blit(peonNegro, (blackPlaces[i][0] * 100 + 22, blackPlaces [i] [1]* 100 +30))
         else:
             screen.blit(imagenesNegras[index], (blackPlaces[i][0] * 100 + 10, blackPlaces [i] [1]* 100 +10))
+        if pasoTurno >= 2 and seleccion < len(blackPlaces):
+            if seleccion ==i:
+                pygame.draw.rect(screen, 'red',[blackPlaces[i][0] *100 +1, blackPlaces[i][1]*100 + 1, 100,100], 2)
+
+# movimiento del peon
+
+def revisaPeon(posicion, color):
+   listaMovimientos=[]
+   if color == 'blanco':
+        if (posicion[0],posicion[1]+1) not in whitePlaces and (posicion[0], posicion[1]+1) not in blackPlaces and posicion[1]<7:
+            listaMovimientos.append((posicion[0], posicion[1]+1)) # si el peon esta sin tocar se mueve 1
+        if (posicion[0],posicion[1]+2) not in whitePlaces and (posicion[0], posicion[1]+2) not in blackPlaces and posicion[1]==1:
+            listaMovimientos.append((posicion[0], posicion[1]+2))  # si el peon esta sin tocar se mueve 2  
+        if (posicion[0] +1, posicion[1]+1) in blackPlaces:
+            listaMovimientos.append(posicion[0]+1, posicion[1]+1)
+        if (posicion[0]-1, posicion[1]+1) in blackPlaces:
+            listaMovimientos.append((posicion[0]-1, posicion[1]+1))
+   else:
+        if (posicion[0],posicion[1]-1) not in whitePlaces and (posicion[0], posicion[1]-1) not in blackPlaces and posicion[1]>0:
+            listaMovimientos.append((posicion[0], posicion[1]-1)) 
+        if (posicion[0],posicion[1]+2) not in whitePlaces and (posicion[0], posicion[1]-2) not in blackPlaces and posicion[1]==6:
+            listaMovimientos.append((posicion[0], posicion[1]-2))  
+        if (posicion[0] +1, posicion[1]-1) in blackPlaces:
+            listaMovimientos.append(posicion[0]+1, posicion[1]-1)
+        if (posicion[0]-1, posicion[1]-1) in blackPlaces:
+            listaMovimientos.append((posicion[0]-1, posicion[1]-1))
+
+
+   """
+def revisa_peon(posicion, color):
+    listaMovimientos = []
+    x, y = posicion
+
+    if color == 'blanco':
+        # Movimiento normal hacia adelante (si la casilla está libre)
+        if (x, y + 1) not in whitePlaces and (x, y + 1) not in blackPlaces:
+            listaMovimientos.append((x, y + 1))
+        
+        # Primer movimiento doble
+        if y == 1 and (x, y + 2) not in whitePlaces and (x, y + 2) not in blackPlaces:
+            listaMovimientos.append((x, y + 2))
+        
+        # Captura en diagonal
+        if (x + 1, y + 1) in blackPlaces:
+            listaMovimientos.append((x + 1, y + 1))
+        if (x - 1, y + 1) in blackPlaces:
+            listaMovimientos.append((x - 1, y + 1))
+
+    else:  # Peón negro
+        if (x, y - 1) not in whitePlaces and (x, y - 1) not in blackPlaces:
+            listaMovimientos.append((x, y - 1))
+        
+        if y == 6 and (x, y - 2) not in whitePlaces and (x, y - 2) not in blackPlaces:
+            listaMovimientos.append((x, y - 2))
+        
+        # Captura en diagonal
+        if (x + 1, y - 1) in whitePlaces:
+            listaMovimientos.append((x + 1, y - 1))
+        if (x - 1, y - 1) in whitePlaces:
+            listaMovimientos.append((x - 1, y - 1))
+
+    return listaMovimientos
+"""
 
 
 
+
+
+def revisaMovimientosValidos():
+    if pasoTurno <2:
+        listaOpciones = opcionesBlancas
+    else:
+        listaOpciones = opcionesNegras
+    opcionesValidas=listaOpciones[seleccion]
+    return opcionesValidas
+
+
+#movimientos validos en tablero
+
+def valido(movimientos):
+    if pasoTurno < 2:
+        color = 'red'
+    else:
+        color = 'blue'
+    for i in range(len(movimientos)):
+        pygame.draw.circle(screen, color, (movimientos[i][0] * 100 + 50, movimientos[i][1] * 100 + 50), 5)
+
+
+#opciones validas en el tablero
+
+def opcionesPosibles(piezas, lugares, turno):
+    listaMovimientos = []
+    listaTodosMovimientos =[]
+    for i in range((len(piezas))):
+        posicion = lugares[i]
+        pieza = piezas[i]
+        if pieza == 'peon':
+            listaMovimientos = revisaPeon(posicion, turno)
+        #elif pieza == 'torre':
+         #   listaMovimientos = revisaTorre(places, turno)
+        #elif pieza == 'alfil':
+       #     listaMovimientos = revisaAlfil(places, turno)
+        #elif pieza == 'caballo':
+        #    listaMovimientos = revisaCaballo(places, turno)
+        #elif pieza == 'rey':
+        #    listaMovimientos = revisaRey(places, turno)
+        #elif pieza == 'reina':
+        #    listaMovimientos = revisaReina(places, turno)
+
+        listaTodosMovimientos.append(listaMovimientos)
+
+
+    return listaTodosMovimientos 
 
 #juego principal
+
+opcionesNegras= opcionesPosibles(black, blackPlaces,'negro')
+opcionesBlancas= opcionesPosibles(white, whitePlaces,'blanco')
 run = True
 while run:
     timer.tick(fps)
-    screen.fill('pink')
-    tablero()
-    Piezas()
-    
+    screen.fill('pink')  # Limpia la pantalla en cada frame
+
+    tablero()  # Dibuja el tablero
+    Piezas()  # Dibuja las piezas
+
+    if seleccion != 100:
+        movimientosValidos = revisaMovimientosValidos()
+        valido(movimientosValidos)
+     
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run= False
+            run = False
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            x_coord = event.pos[0] // 100
+            y_coord = event.pos[1] // 100
+            click_coords = (x_coord, y_coord)
+
+            if pasoTurno <= 1:
+                if click_coords in whitePlaces:
+                    seleccion = whitePlaces.index(click_coords)
+                    if pasoTurno == 0:
+                        pasoTurno = 1
+                elif click_coords in movimientosValidos and seleccion != 100:
+                    whitePlaces[seleccion] = click_coords  # Actualiza la posición
+                    pasoTurno = 2  # Cambia de turno
+                    seleccion = 100
+                    movimientosValidos = []
+
+            if pasoTurno > 1:
+                if click_coords in blackPlaces:
+                    seleccion = blackPlaces.index(click_coords)
+                    if pasoTurno == 2:
+                        pasoTurno = 3
+                elif click_coords in movimientosValidos and seleccion != 100:
+                    blackPlaces[seleccion] = click_coords
+                    pasoTurno = 0
+                    seleccion = 100
+                    movimientosValidos = []
+
+    pygame.display.update() #¡ACTUALIZA LA PANTALLA!
+
+
     
-    pygame.display.flip 
-    pygame.display.update()
 pygame.quit()
