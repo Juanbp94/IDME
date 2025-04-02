@@ -1,7 +1,7 @@
 
 
 import pygame
-
+ 
 pygame.init()
 
 WIDTH = 1000
