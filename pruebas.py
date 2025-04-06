@@ -340,6 +340,10 @@ def revisaMovimientoLineal(posicion, color, direcciones):
                 cuantoAlfil += 1
             else:
                 # Si encuentra una pieza aliada o sale del tablero, detiene el movimiento en esta
+                comoAlfil = False
+
+    # Devolver la lista de movimientos válidos encontrados
+    return listaMovimientos
 
 #movimientos de la torre
 def revisaTorre(posicion, color):

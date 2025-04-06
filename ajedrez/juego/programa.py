@@ -1,7 +1,6 @@
 
 import pygame
 
-#Se inicia el juego
 pygame.init()
 #Tamaño de la ventana
 WIDTH = 1000
